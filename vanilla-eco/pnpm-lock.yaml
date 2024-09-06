@@ -32,6 +32,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.10
         version: 3.4.10
+      unenv:
+        specifier: ^1.10.0
+        version: 1.10.0
       vinxi:
         specifier: ^0.4.2
         version: 0.4.2(@types/node@22.5.1)(ioredis@5.4.1)(magicast@0.2.11)(terser@5.31.6)
