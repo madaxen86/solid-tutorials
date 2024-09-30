@@ -1,6 +1,5 @@
-import { A, action, cache, createAsync, json, redirect, reload, useAction, useSubmission } from "@solidjs/router";
+import { action, cache, createAsync, redirect, useAction, useSubmission } from "@solidjs/router";
 import { Suspense } from "solid-js";
-import Counter from "~/components/Counter";
 
 /**
  * db mock
