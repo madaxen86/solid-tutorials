@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@kobalte/core": "^0.13.6",
+    "@solid-primitives/intersection-observer": "^2.1.6",
+    "@solid-primitives/resource": "^0.3.1",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.14.7",
     "@solidjs/start": "^1.0.8",
@@ -16,10 +18,15 @@
     "clsx": "^2.1.1",
     "solid-js": "^1.9.1",
     "tailwind-merge": "^2.5.2",
+    "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
     "vinxi": "^0.4.3"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47"
   }
 }
