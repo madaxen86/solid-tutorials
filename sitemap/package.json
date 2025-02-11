@@ -4,16 +4,20 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start",
+    "sitemap": "vinxi run sitemap.ts"
   },
   "dependencies": {
-    "@solidjs/router": "^0.14.7",
-    "@solidjs/start": "^1.0.8",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "solid-js": "^1.9.1",
-    "tailwindcss": "^3.4.3",
-    "vinxi": "^0.4.3"
+    "@solidjs/router": "^0.14.10",
+    "@solidjs/start": "^1.0.10",
+    "autoprefixer": "^10.4.20",
+    "nitropack": "^2.10.4",
+    "postcss": "^8.4.47",
+    "solid-js": "^1.9.3",
+    "solid-start-sitemap": "0.0.8-alpha",
+    "tailwindcss": "^3.4.14",
+    "vinxi": "^0.4.3",
+    "vite-plugin-sitemap": "^0.7.1"
   },
   "engines": {
     "node": ">=18"
