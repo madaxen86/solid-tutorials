@@ -1,71 +1,110 @@
-import { action, cache, createAsync, redirect, useAction, useSubmission } from "@solidjs/router";
+import {
+  createAsync,
+  redirect,
+  useAction,
+  useSubmission,
+  json,
+  query,
+  action,
+  reload,
+  RouteDefinition,
+} from "@solidjs/router";
 import { Suspense } from "solid-js";
 
-/**
- * db mock
- */
-let db = {
-  name: "John Dev",
-  skills: ["React"],
-};
+import { db, wait } from "~/db";
 
-const getDate = cache(async () => {
+const getUser = query(async () => {
   "use server";
-  return new Date().toLocaleString();
+  await wait(500);
+  return await db.queryUser();
+}, "_getUser");
+
+const mutateUser = action(async (formData: FormData) => {
+  "use server";
+  const id = formData.get("id") as string;
+  const skills = formData.get("skills") as string;
+  const name = formData.get("name") as string;
+
+  await db.updateUser({ id, name, skills });
+
+  //return reload({ revalidate: [getUser.key] });
+  //return json({ message: "updated skill" }, { revalidate: [getUser.key] });
+  return redirect("/about", { revalidate: [getUser.key] });
+}, "mutateUser");
+
+const getDate = query(async () => {
+  "use server";
+  await wait(2000);
+  return new Date().toLocaleTimeString();
 }, "getDate");
 
-const getUser = cache(async function getUser() {
-  "use server";
-  return db;
-}, "getUser");
+/**
+ * Routes
+ */
 
-const addSkill = action(async (formData: FormData) => {
-  "use server";
-  await new Promise((r) => setTimeout(r, 3000));
-  const skill = formData.get("skill") as string;
-  db.skills = skill.split(", ");
-  //return reload({ revalidate: [getUser.key, "session"] });
-  //return json({ message: "updated skill" }, { revalidate: [getUser.key, "session"] });
-  return redirect("/", { revalidate: [getUser.key, "session"] });
-});
+export const route = {
+  preload: () => {
+    getUser();
+    getDate();
+  },
+} satisfies RouteDefinition;
 
 export default function Home() {
   const date = createAsync(() => getDate());
   const user = createAsync(() => getUser());
 
-  const updateSkill = useAction(addSkill);
-  const submit = useSubmission(addSkill);
+  const submit = useSubmission(mutateUser);
+  const mutate = useAction(mutateUser);
   return (
-    <main class="text-center mx-auto  p-4 text-3xl">
-      <h1 class="max-6-xs text-6xl text-sky-700   my-16">Actions in SolidStart</h1>
-      <Suspense>
-        <p class="pb-4">Date: {date()}</p>
+    <main class="text-center mx-auto  p-4 text-3xl container flex flex-col gap-3">
+      <h1 class="max-6-xs text-6xl text-sky-400   mt-12 mb-4">Actions in SolidStart</h1>
+      <h2 class="text-sky-400  ">Revalidate queries through actions</h2>
+      <h2 class="text-sky-400  mb-8">How to leverage Single-Flight-Mutations</h2>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<p>fetching date...</p>}>
+          <p>Date: {date()}</p>
+        </Suspense>
+
+        {/* Display data */}
         <p>Name: {user()?.name}</p>
-        <p>Skills: {user()?.skills.join(", ")}</p>
+        <p>Skills: {user()?.skills.split(",").join(", ")}</p>
+
         <form
-          // action={addSkill}
-          // method="post"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (submit?.pending) return;
-            const formData = new FormData(e.target as HTMLFormElement);
-            updateSkill(formData);
-          }}
-          class="flex flex-col gap-5"
-          classList={{ "opacity-50": submit?.pending }}
+          action={mutateUser}
+          method="post"
+          // onSubmit={async (e) => {
+          //   e.preventDefault();
+          //   console.log("submitting");
+
+          //   const data = new FormData(e.currentTarget);
+          //   // const check = validate(Object.fromEntries(data));
+          //   await mutate(data);
+          // }}
+          class="flex flex-col gap-5  bg-stone-600 p-8 rounded-lg"
         >
           <input
-            name="skill"
-            type="text"
-            value={user()?.skills.join(", ")}
-            class="text-black"
+            name="id"
+            hidden
+            value={user()?.id}
+          />
+          <input
+            name="name"
+            value={user()?.name}
             disabled={submit?.pending}
+            class="text-black p-2 rounded-lg "
+          />
+          <input
+            name="skills"
+            type="text"
+            value={user()?.skills}
+            disabled={submit?.pending}
+            class="text-black p-2 rounded-lg "
           />
           <button
             disabled={submit?.pending}
-            class="disabled:opacity-50"
+            class="disabled:opacity-50 border rounded-lg p1"
           >
-            Submit
+            {submit?.pending ? "Updating..." : "Submit"}
           </button>
         </form>
       </Suspense>
